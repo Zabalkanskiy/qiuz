@@ -1,8 +1,15 @@
 package com.example.qiuz
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
+import android.webkit.CookieManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -10,9 +17,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.BuildConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import java.util.Locale
 
+
 class MainActivity : AppCompatActivity() {
+     var webView: WebView? = null
+
+
     lateinit var questionText: TextView
     lateinit var firstButton: Button
     lateinit var secondButton: Button
@@ -32,51 +44,143 @@ class MainActivity : AppCompatActivity() {
     private var currentIndex: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val remoteString: String = loadRemoteString(context = this)
+        if(remoteString =="") {
+            val remoteConfig = FirebaseRemoteConfig.getInstance()
+            val config: FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600).build()
+            remoteConfig.setConfigSettingsAsync(config)
+            remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val result = remoteConfig.getString("qiuzRemoteString")
+                   // saveRemoteString(this, result)
+                   // val getString =  loadRemoteString(this)
+                    if(result == "" || checkIsEmu()){
+                        // открываем заглушку
+                        setContentView(R.layout.activity_quiz)
+                        questionText = findViewById(R.id.question_text_view)
+                        firstButton = findViewById(R.id.first_button)
 
-        val remoteConfig = FirebaseRemoteConfig.getInstance()
-        val result = remoteConfig.getString("qiuzRemoteString")
-        val remote = remoteConfig.getString("remote")
-        Log.d("REMOTE", remote)
-        Log.d("REMOTECONFIG ", result)
-        setContentView(R.layout.activity_quiz)
-        questionText = findViewById(R.id.question_text_view)
-        firstButton = findViewById(R.id.first_button)
+                        firstButton.setOnClickListener{view ->
+                            checkAnswer(mQuestionBank[currentIndex].firstButton)
+                        }
+                        secondButton= findViewById(R.id.second_button)
 
-        firstButton.setOnClickListener{view ->
-            checkAnswer(mQuestionBank[currentIndex].firstButton)
-        }
-        secondButton= findViewById(R.id.second_button)
+                        secondButton.setOnClickListener{view ->
+                            checkAnswer(mQuestionBank[currentIndex].secondButton)
+                        }
+                        thirdButton = findViewById(R.id.third_button)
 
-        secondButton.setOnClickListener{view ->
-            checkAnswer(mQuestionBank[currentIndex].secondButton)
-        }
-        thirdButton = findViewById(R.id.third_button)
-
-        thirdButton.setOnClickListener{view ->
-            checkAnswer(mQuestionBank[currentIndex].thirdButton)
-        }
-        fourButton = findViewById(R.id.four_button)
+                        thirdButton.setOnClickListener{view ->
+                            checkAnswer(mQuestionBank[currentIndex].thirdButton)
+                        }
+                        fourButton = findViewById(R.id.four_button)
 
 
-        fourButton.setOnClickListener{view ->
-            checkAnswer(mQuestionBank[currentIndex].fourButton)
-        }
-        nextButton = findViewById(R.id.next_button)
-        nextButton.setOnClickListener{view ->
+                        fourButton.setOnClickListener{view ->
+                            checkAnswer(mQuestionBank[currentIndex].fourButton)
+                        }
+                        nextButton = findViewById(R.id.next_button)
+                        nextButton.setOnClickListener{view ->
 
-            currentIndex = (currentIndex + 1) % mQuestionBank.size
-            updateQuestion()
-        }
-         previousButton = findViewById(R.id.previous_button)
-        previousButton.setOnClickListener{
-            if(currentIndex > 0) {
-                currentIndex = (currentIndex + 1) % mQuestionBank.size
-            }else {
-                currentIndex = mQuestionBank.size -1
+                            currentIndex = (currentIndex + 1) % mQuestionBank.size
+                            updateQuestion()
+                        }
+                        previousButton = findViewById(R.id.previous_button)
+                        previousButton.setOnClickListener{
+                            if(currentIndex > 0) {
+                                currentIndex = (currentIndex + 1) % mQuestionBank.size
+                            }else {
+                                currentIndex = mQuestionBank.size -1
+                            }
+                            updateQuestion()
+                        }
+                        updateQuestion()
+
+                    }else{
+                        val remoteString = remoteConfig.getString("qiuzRemoteString")
+                        saveRemoteString(this, remoteString)
+
+                        setContentView(R.layout.web_view_activity)
+                        webView = findViewById(R.id.webView) as WebView
+                        webView!!.webViewClient= WebViewClient()
+                       // webView!!.webChromeClient = ChromeClient()
+                        var webSettings = webView?.settings
+                        webSettings?.javaScriptEnabled = true
+                        webSettings?.loadWithOverviewMode =true
+                        webSettings?.useWideViewPort =true
+                        webSettings?.domStorageEnabled =true
+                        webSettings?.databaseEnabled = true
+                        webSettings?.setSupportZoom(false)
+                        webSettings?.allowFileAccess = true
+                        webSettings?.allowContentAccess = true
+                        webSettings?.loadWithOverviewMode =true
+                        webSettings?.useWideViewPort =true
+
+
+                        webSettings?.javaScriptCanOpenWindowsAutomatically =true
+
+                        if( savedInstanceState != null){
+                            webView?.restoreState(savedInstanceState)
+                        } else webView?.loadUrl(remoteString)
+
+                        val cookieManager = CookieManager.getInstance()
+                        cookieManager.setAcceptCookie(true)
+
+
+                    }
+                   // val remote = remoteConfig.getString("remote")
+                    //Log.d("REMOTE", remote)
+                   // Log.d("REMOTECONFIG ", result)
+                }
             }
-            updateQuestion()
+        }else {
+
+           if( isOnline()){
+                setContentView(R.layout.web_view_activity)
+                webView = findViewById(R.id.webView)
+               webView?.webViewClient= WebViewClient()
+               var webSettings = webView?.settings
+               webSettings?.javaScriptEnabled = true
+               webSettings?.loadWithOverviewMode =true
+               webSettings?.useWideViewPort =true
+               webSettings?.domStorageEnabled =true
+               webSettings?.databaseEnabled = true
+               webSettings?.setSupportZoom(false)
+               webSettings?.allowFileAccess = true
+               webSettings?.allowContentAccess = true
+               webSettings?.loadWithOverviewMode =true
+               webSettings?.useWideViewPort =true
+
+
+               webSettings?.javaScriptCanOpenWindowsAutomatically =true
+
+               if( savedInstanceState != null){
+                   webView?.restoreState(savedInstanceState)
+               } else webView?.loadUrl(remoteString)
+
+               val cookieManager = CookieManager.getInstance()
+               cookieManager.setAcceptCookie(true)
+
+
+
+
+
+
+
+
+
+
+
+
+
+           }else{
+               setContentView(R.layout.no_internet_activity)
+
+           }
+
         }
-        updateQuestion()
+
 
 
 
@@ -136,6 +240,53 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+
         super.onSaveInstanceState(outState)
+        webView?.saveState(outState)
     }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+
+        super.onRestoreInstanceState(savedInstanceState)
+        webView?.restoreState(savedInstanceState)
+    }
+
+    override fun onBackPressed() {
+        if (webView!!.canGoBack()) {
+            webView!!.goBack()
+        }
+    }
+     fun isOnline(): Boolean {
+
+         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             val nw      = connectivityManager.activeNetwork ?: return false
+             val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
+             return when {
+                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                 //for other device how are able to connect with Ethernet
+                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                 else -> false
+             }
+         } else {
+             val nwInfo = connectivityManager.activeNetworkInfo ?: return false
+             return nwInfo.isConnected
+         }
+
+
+     }
+}
+const val PREFS_NAME = "QIUZ"
+const val REMOTE_STRING = "REMOTESTRING"
+const val DEFAULT_STRING = ""
+fun loadRemoteString(context: Context): String{
+    val prefs = context.getSharedPreferences(PREFS_NAME, 0)
+    val prefString = prefs.getString(REMOTE_STRING, DEFAULT_STRING)
+    return  prefString ?: DEFAULT_STRING
+}
+
+fun saveRemoteString(context: Context, remoteString: String){
+    val putstring = context.getSharedPreferences(PREFS_NAME, 0).edit().putString(REMOTE_STRING, remoteString).apply()
 }

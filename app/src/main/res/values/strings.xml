@@ -4,4 +4,6 @@
     <string name="false_button">false\n</string>
     <string name="previous_button_content_description">previous button</string>
     <string name="next_button_content_description">next button\n</string>
+    <string name="needInternet">Internet is required for the application to work.</string>
+    <string name="please_internet">Please turn on the internet</string>
 </resources>
