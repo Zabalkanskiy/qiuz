@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "723965803190",
+    "project_id": "qiuz-a9638",
+    "storage_bucket": "qiuz-a9638.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723965803190:android:faf8ff4d2f22b295280417",
+        "android_client_info": {
+          "package_name": "com.example.qiuz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "723965803190-f5fp4jf5jnrv2p0116kdr28rcn43vs1e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc9wRVFHGqvyzekrw6GW-MA8vH6G5MI-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "723965803190-f5fp4jf5jnrv2p0116kdr28rcn43vs1e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

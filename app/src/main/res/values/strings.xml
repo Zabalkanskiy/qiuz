@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">qiuz</string>
+    <string name="true_button">true</string>
+    <string name="false_button">false\n</string>
+    <string name="previous_button_content_description">previous button</string>
+    <string name="next_button_content_description">next button\n</string>
+</resources>
