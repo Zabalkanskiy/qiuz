@@ -6,4 +6,7 @@
     <string name="next_button_content_description">next button\n</string>
     <string name="needInternet">Internet is required for the application to work.</string>
     <string name="please_internet">Please turn on the internet</string>
+    <string name="result">Your result</string>
+    <string name="excellent">Excellent</string>
+    <string name="startagain">startAgain</string>
 </resources>

@@ -1,10 +1,14 @@
 package com.example.qiuz
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
 import android.webkit.CookieManager
@@ -18,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.BuildConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import kotlinx.coroutines.delay
 import java.util.Locale
 
 
@@ -31,7 +36,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var thirdButton: Button
     lateinit var fourButton: Button
     lateinit var nextButton: ImageButton
-    lateinit var previousButton: ImageButton
 
     private val mQuestionBank: List<Question> = listOf<Question>(
         Question(text = "What Is The Nickname Of Manchester United?", firstButton = "The Red Lions", secondButton = "The Gunners", thirdButton = "The Old Lady", fourButton = "The Red Devils", answer = "The Red Devils"),
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     )
     private var currentIndex: Int = 0
+    private var resultGame:Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val remoteString: String = loadRemoteString(context = this)
@@ -62,40 +67,120 @@ class MainActivity : AppCompatActivity() {
                         firstButton = findViewById(R.id.first_button)
 
                         firstButton.setOnClickListener{view ->
-                            checkAnswer(mQuestionBank[currentIndex].firstButton)
+                            val checkResult =  checkAnswer(mQuestionBank[currentIndex].firstButton)
+                            if(checkResult){
+                                view.setBackgroundColor(Color.GREEN)
+                                resultGame +=1
+                            }else{
+                                view.setBackgroundColor(Color.RED)
+                            }
+                            Handler(Looper.getMainLooper()).postDelayed({
+
+                                currentIndex = currentIndex + 1
+                                if(currentIndex> (mQuestionBank.size -1)){
+                                    val intent = Intent(this, ResultActivity::class.java)
+                                    intent.putExtra("RESULT", resultGame)
+                                    startActivity(intent)
+                                } else{
+                                    updateQuestion()
+                                }
+
+
+                            }, 2000)
                         }
                         secondButton= findViewById(R.id.second_button)
 
                         secondButton.setOnClickListener{view ->
-                            checkAnswer(mQuestionBank[currentIndex].secondButton)
+                            val checkResult =  checkAnswer(mQuestionBank[currentIndex].secondButton)
+                            if(checkResult){
+                                view.setBackgroundColor(Color.GREEN)
+                                resultGame +=1
+                            }else{
+                                view.setBackgroundColor(Color.RED)
+                            }
+                            Handler(Looper.getMainLooper()).postDelayed({
+
+                                currentIndex = currentIndex + 1
+                                if(currentIndex> (mQuestionBank.size -1)){
+                                    val intent = Intent(this, ResultActivity::class.java)
+                                    intent.putExtra("RESULT", resultGame)
+                                    startActivity(intent)
+                                } else{
+
+                                    updateQuestion()
+                                }
+
+
+                            }, 2000)
                         }
                         thirdButton = findViewById(R.id.third_button)
 
                         thirdButton.setOnClickListener{view ->
-                            checkAnswer(mQuestionBank[currentIndex].thirdButton)
+                            val checkResult =  checkAnswer(mQuestionBank[currentIndex].thirdButton)
+                            if(checkResult){
+                                view.setBackgroundColor(Color.GREEN)
+                                resultGame +=1
+                            }else{
+                                view.setBackgroundColor(Color.RED)
+                            }
+                            Handler(Looper.getMainLooper()).postDelayed({
+
+                                currentIndex = currentIndex + 1
+                                if(currentIndex> (mQuestionBank.size -1)){
+                                    val intent = Intent(this, ResultActivity::class.java)
+                                    intent.putExtra("RESULT", resultGame)
+                                    startActivity(intent)
+                                } else{
+                                    updateQuestion()
+                                }
+
+
+                            }, 2000)
                         }
                         fourButton = findViewById(R.id.four_button)
 
 
                         fourButton.setOnClickListener{view ->
-                            checkAnswer(mQuestionBank[currentIndex].fourButton)
+                            val checkResult =  checkAnswer(mQuestionBank[currentIndex].fourButton)
+                            if(checkResult){
+                                view.setBackgroundColor(Color.GREEN)
+                                resultGame +=1
+                            }else{
+                                view.setBackgroundColor(Color.RED)
+                            }
+                            Handler(Looper.getMainLooper()).postDelayed({
+
+                                    currentIndex = currentIndex + 1
+                                if(currentIndex> (mQuestionBank.size -1)){
+                                    val intent = Intent(this, ResultActivity::class.java)
+                                    intent.putExtra("RESULT", resultGame)
+                                    startActivity(intent)
+                                } else {
+
+                                    updateQuestion()
+                                }
+
+
+                            }, 2000)
                         }
                         nextButton = findViewById(R.id.next_button)
                         nextButton.setOnClickListener{view ->
 
-                            currentIndex = (currentIndex + 1) % mQuestionBank.size
-                            updateQuestion()
-                        }
-                        previousButton = findViewById(R.id.previous_button)
-                        previousButton.setOnClickListener{
-                            if(currentIndex > 0) {
-                                currentIndex = (currentIndex + 1) % mQuestionBank.size
-                            }else {
-                                currentIndex = mQuestionBank.size -1
+                            currentIndex = currentIndex + 1
+
+                            if(currentIndex> (mQuestionBank.size -1)){
+                                val intent = Intent(this, ResultActivity::class.java)
+                                intent.putExtra("RESULT", resultGame)
+                                startActivity(intent)
+                            }else{
+
+                                updateQuestion()
                             }
+
+                        }
+                        if(currentIndex< mQuestionBank.size) {
                             updateQuestion()
                         }
-                        updateQuestion()
 
                     }else{
                         val remoteString = remoteConfig.getString("qiuzRemoteString")
@@ -188,22 +273,30 @@ class MainActivity : AppCompatActivity() {
     private fun updateQuestion(){
         val textString = mQuestionBank[currentIndex].text
         questionText.text = textString
-
         firstButton.text = mQuestionBank[currentIndex].firstButton
+        firstButton.setBackgroundColor(Color.WHITE)
         secondButton.text = mQuestionBank[currentIndex].secondButton
+        secondButton.setBackgroundColor(Color.WHITE)
         thirdButton.text = mQuestionBank[currentIndex].thirdButton
+        thirdButton.setBackgroundColor(Color.WHITE)
         fourButton.text = mQuestionBank[currentIndex].fourButton
+        fourButton.setBackgroundColor(Color.WHITE)
     }
 
-    private fun checkAnswer(userString: String){
+    private fun checkAnswer(userString: String): Boolean{
        val rightAnswer: String = mQuestionBank[currentIndex].answer
         var message =""
+        var boolResult:Boolean = false
         if(userString == rightAnswer){
             message = "This answer is correct"
+            boolResult = true
         } else{
             message = "This answer is incorrect"
+            boolResult = false
+
         }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        return boolResult
     }
     private fun checkIsEmu(): Boolean {
         if (BuildConfig.DEBUG) return false
