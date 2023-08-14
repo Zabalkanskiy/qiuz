@@ -9,20 +9,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.PersistableBundle
-import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.BuildConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 
@@ -36,13 +34,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var thirdButton: Button
     lateinit var fourButton: Button
     lateinit var nextButton: ImageButton
+    lateinit var linearLayout: LinearLayout
+    lateinit var imageView: ImageView
 
     private val mQuestionBank: List<Question> = listOf<Question>(
-        Question(text = "What Is The Nickname Of Manchester United?", firstButton = "The Red Lions", secondButton = "The Gunners", thirdButton = "The Old Lady", fourButton = "The Red Devils", answer = "The Red Devils"),
-        Question(text = "Which Country Has Won The World Cup The Most Times?", firstButton = "Spain", secondButton = "Germany", thirdButton = "Italy", fourButton = "Brazil", answer = "Brazil"),
-        Question(text = "What Is The German Soccer League Called?", firstButton = "The Bundesliga", secondButton = "The Blitzliga", thirdButton = "The Volksliga", fourButton = "The Reichsliga", answer = "The Bundesliga"),
-        Question(text = "Which former Barcelona Player Is Famous For Biting Other Players?", firstButton = "Didier Drogba", secondButton = "David Luiz", thirdButton = "Luis Suarez", fourButton = "Lionel Messi", answer = "Luis Suarez"),
-        Question(text = "Which football club does David Beckham play for last?", firstButton = "Manchester United", secondButton = "Liverpool", thirdButton = "Real Madrid", fourButton = "PSG", answer = "PSG"),
+        Question(text = "What Is The Nickname Of Manchester United?", firstButton = "The Red Lions", secondButton = "The Gunners", thirdButton = "The Old Lady", fourButton = "The Red Devils", answer = "The Red Devils", resBackground = R.drawable.tg_image_1),
+        Question(text = "Which Country Has Won The World Cup The Most Times?", firstButton = "Spain", secondButton = "Germany", thirdButton = "Italy", fourButton = "Brazil", answer = "Brazil",resBackground = R.drawable.tg_image_2),
+        Question(text = "What Is The German Soccer League Called?", firstButton = "The Bundesliga", secondButton = "The Blitzliga", thirdButton = "The Volksliga", fourButton = "The Reichsliga", answer = "The Bundesliga", resBackground = R.drawable.tg_image_3),
+        Question(text = "Which former Barcelona Player Is Famous For Biting Other Players?", firstButton = "Didier Drogba", secondButton = "David Luiz", thirdButton = "Luis Suarez", fourButton = "Lionel Messi", answer = "Luis Suarez", resBackground = R.drawable.tg_image_4),
+        Question(text = "Which football club does David Beckham play for last?", firstButton = "Manchester United", secondButton = "Liverpool", thirdButton = "Real Madrid", fourButton = "PSG", answer = "PSG", resBackground = R.drawable.tg_image_5),
 
     )
     private var currentIndex: Int = 0
@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity() {
                     if(result == "" || checkIsEmu()){
                         // открываем заглушку
                         setContentView(R.layout.activity_quiz)
+                        imageView = findViewById(R.id.actyvityImageView)
+                        linearLayout = findViewById(R.id.linear_activity)
                         questionText = findViewById(R.id.question_text_view)
                         firstButton = findViewById(R.id.first_button)
 
@@ -272,7 +274,14 @@ class MainActivity : AppCompatActivity() {
     }
     private fun updateQuestion(){
         val textString = mQuestionBank[currentIndex].text
+        if (currentIndex == 3){
+            questionText.setTextColor(Color.BLACK)
+        }else{
+            questionText.setTextColor(Color.WHITE)
+        }
+
         questionText.text = textString
+
         firstButton.text = mQuestionBank[currentIndex].firstButton
         firstButton.setBackgroundColor(Color.WHITE)
         secondButton.text = mQuestionBank[currentIndex].secondButton
@@ -281,6 +290,8 @@ class MainActivity : AppCompatActivity() {
         thirdButton.setBackgroundColor(Color.WHITE)
         fourButton.text = mQuestionBank[currentIndex].fourButton
         fourButton.setBackgroundColor(Color.WHITE)
+        //linearLayout.setBackgroundResource(mQuestionBank[currentIndex].resBackground)
+        imageView.setImageResource(mQuestionBank[currentIndex].resBackground)
     }
 
     private fun checkAnswer(userString: String): Boolean{
@@ -295,7 +306,7 @@ class MainActivity : AppCompatActivity() {
             boolResult = false
 
         }
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+       // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         return boolResult
     }
     private fun checkIsEmu(): Boolean {
