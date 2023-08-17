@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var secondButton: Button
     lateinit var thirdButton: Button
     lateinit var fourButton: Button
-    lateinit var nextButton: ImageButton
+   // lateinit var nextButton: ImageButton
     lateinit var linearLayout: LinearLayout
     lateinit var imageView: ImageView
     lateinit var linearImageView: ImageView
@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                                     val intent = Intent(this, ResultActivity::class.java)
                                     intent.putExtra("RESULT", resultGame)
                                     startActivity(intent)
+                                    finish()
                                 } else{
                                     updateQuestion()
                                 }
@@ -127,6 +128,7 @@ class MainActivity : AppCompatActivity() {
                                     val intent = Intent(this, ResultActivity::class.java)
                                     intent.putExtra("RESULT", resultGame)
                                     startActivity(intent)
+                                    finish()
                                 } else{
 
                                     updateQuestion()
@@ -152,6 +154,7 @@ class MainActivity : AppCompatActivity() {
                                     val intent = Intent(this, ResultActivity::class.java)
                                     intent.putExtra("RESULT", resultGame)
                                     startActivity(intent)
+                                    finish()
                                 } else{
                                     updateQuestion()
                                 }
@@ -177,6 +180,7 @@ class MainActivity : AppCompatActivity() {
                                     val intent = Intent(this, ResultActivity::class.java)
                                     intent.putExtra("RESULT", resultGame)
                                     startActivity(intent)
+                                    finish()
                                 } else {
 
                                     updateQuestion()
@@ -185,21 +189,7 @@ class MainActivity : AppCompatActivity() {
 
                             }, 2000)
                         }
-                        nextButton = findViewById(R.id.next_button)
-                        nextButton.setOnClickListener{view ->
 
-                            currentIndex = currentIndex + 1
-
-                            if(currentIndex> (mQuestionBank.size -1)){
-                                val intent = Intent(this, ResultActivity::class.java)
-                                intent.putExtra("RESULT", resultGame)
-                                startActivity(intent)
-                            }else{
-
-                                updateQuestion()
-                            }
-
-                        }
                         if(currentIndex< mQuestionBank.size) {
                             updateQuestion()
                         }
